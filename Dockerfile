@@ -1,23 +1,21 @@
-FROM ubuntu:14.04
-MAINTAINER Chi-Wen Fann <allanfann@gmail.com>
- 
-# Import scrapy signing key
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 627220E7
+FROM node:7.4.0
 
-# Create an apt sources.list file
-RUN echo 'deb http://archive.scrapy.org/ubuntu scrapy main' | tee /etc/apt/sources.list.d/scrapy.list
+RUN wget https://github.com/scrapy/scrapy/archive/1.3.zip 
 
-# update source list
-RUN apt-get update -y
- 
-# Install scrapy
-RUN apt-get -y install scrapy-0.24 git
+RUN echo 'deb http://security.debian.org/debian-security wheezy/updates main' | tee /etc/apt/sources.list.d/unzip.list
 
-# create working directory
+RUN apt-get update
+
+RUN apt-get install -y python-pip python-dev build-essential unzip
+
+RUN pip install scrapy==1.3
+RUN pip install scrapyd==1.1.0
+
 RUN mkdir /app
 
-# change working directory
 WORKDIR /app
 
+COPY block.js /app/
 
-
+EXPOSE 8080
+CMD [ "node", "block.js" ]
